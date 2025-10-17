@@ -3,8 +3,9 @@ import { config } from "dotenv";
 config();
 
 export const PORT = process.env.PORT || 3000;
-export const DB_USER = process.env.DB_USER || root;
+export const DB_USER = process.env.DB_USER || "root";
 export const DB_PASSWORD = process.env.DB_PASSWORD || "";
-export const DB_HOST = process.env.BD_HOST || 3306;
+export const DB_HOST = process.env.DB_HOST || "localhost";
+export const DB_PORT = process.env.DB_PORT || 3306;
 export const DB_DATABASE = process.env.DB_DATABASE || "repositorio2";
-export const CLAVE__JWT = process.env.CLAVE__JWT;
+export const CLAVE_JWT = process.env.CLAVE_JWT || "clave_secreta";
