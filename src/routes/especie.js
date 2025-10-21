@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { getEspecie } from "../controllers/Especie.js";
-const routesespecie = Router();
+const routesEspecie = Router();
 
-routesespecie.get("/api/especie", getEspecie);
+routesEspecie.get("/api/especie", getEspecie);
 
-export default routesespecie;
+export default routesEspecie;
