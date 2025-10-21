@@ -25,7 +25,7 @@ const options = {
 };
 
 app.use(
-    cors({ origin: ['http://localhost:3000', 'http://10.121.63.130'] })
+    cors({ origin: ['http://localhost:3000', 'http://192.168.101.72'] })
 );
 
 app.use(Express.static('src/public'));
