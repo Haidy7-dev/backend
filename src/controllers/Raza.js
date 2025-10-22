@@ -1,8 +1,8 @@
 import { pool } from "../../utils/db.js";
 
-export const getraza = async (req, res) => {
+export const getRaza = async (req, res) => {
   try {
-    const [result] = await pool.query("SELECT nombre FROM razas");
+    const [result] = await pool.query("SELECT nombre FROM raza");
     console.log(result);
     res.json(result);
   } catch (err) {

@@ -7,12 +7,9 @@ import os from "os";
 import FormData from "express-form-data";
 import routesEspecializacion from "./src/routes/especializaciones.js";
 import routesServicio from "./src/routes/servicio.js";
-import routesraza from "./src/routes/raza.js";
-import routessexo from "./src/routes/sexo.js";
-import routesespecie from "./src/routes/especie.js";
+import routesRaza from "./src/routes/raza.js";
+import routesEspecie from "./src/routes/especie.js";
 import routesFotos from "./src/routes/fotos.js";
-
-
 
 
 const app = Express();
@@ -25,7 +22,16 @@ const options = {
 };
 
 app.use(
-    cors({ origin: ['http://localhost:3000', 'http://10.121.63.130'] })
+    // IP Salomé datos
+    // cors({ origin: ['http://localhost:3000', 'http://----------'] })
+
+    // IP Salomé datos
+    // cors({ origin: ['http://localhost:3000', 'http://10.121.63.130'] })
+
+    //IP Haidy casa
+    //cors({ origin: ['http://localhost:3000', 'http://192.168.1.16'] })
+    //IP Haidy datos
+    cors({ origin: ['http://localhost:3000', 'http://10.164.93.119'] })
 );
 
 app.use(Express.static('src/public'));
@@ -44,9 +50,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(RutasLogin)
 app.use(routesEspecializacion)
 app.use(routesServicio)
-app.use(routesraza)
-app.use(routessexo)
-app.use(routesespecie)
+app.use(routesRaza)
+app.use(routesEspecie)
 app.use(routesFotos)
 
 

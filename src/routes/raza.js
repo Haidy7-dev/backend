@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { getraza } from "../controllers/Raza.js";   
+import { getRaza } from "../controllers/Raza.js";   
 const routesRaza = Router();
 
-routesRaza.get("/api/raza", getraza);
+routesRaza.get("/api/raza", getRaza);
 
 export default routesRaza;
