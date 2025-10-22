@@ -4,21 +4,24 @@ import fs from "fs";
 import { pool } from "../../utils/db.js";
 
 const fotosDir = path.join(process.cwd(), "src", "fotos");
+
+// Crear carpeta si no existe
 if (!fs.existsSync(fotosDir)) {
   fs.mkdirSync(fotosDir, { recursive: true });
 }
 
 const storage = multer.diskStorage({
-  destination: 'fotos/',
+  destination: (req, file, cb) => {
+    cb(null, fotosDir); // ✅ usar la ruta absoluta
+  },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-  }
+    cb(null, file.fieldname + "-" + uniqueSuffix + ext);
+  },
 });
 
 const upload = multer({ storage });
-
 // --- Controladores --- //
 export const subirFotoVeterinario = [
   upload.single("foto"),
@@ -55,7 +58,7 @@ export const subirFotoVeterinario = [
 export const subirFotoUsuario = [
   upload.single("foto"),
   async (req, res) => {
-    try {
+     try {
       if (!req.file)
         return res.status(400).json({ error: "No se envió ninguna foto" });
 

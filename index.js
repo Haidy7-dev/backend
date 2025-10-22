@@ -1,25 +1,27 @@
 import Express from "express";
 import RutasLogin from "./src/routes/login.js"
-import { PORT } from "./utils/config.js"
 import cors from "cors"
 import bodyParser from "body-parser";
-import os from "os";
-import FormData from "express-form-data";
+import { PORT } from "./utils/config.js"
+// import os from "os";
+// import FormData from "express-form-data";
+// import RutasLogin from "./src/routes/login.js";
 import routesEspecializacion from "./src/routes/especializaciones.js";
 import routesServicio from "./src/routes/servicio.js";
 import routesRaza from "./src/routes/raza.js";
 import routesEspecie from "./src/routes/especie.js";
 import routesFotos from "./src/routes/fotos.js";
+import routesVeterinario from "./src/routes/veterinario_o_zootecnista.js";
 
 
 const app = Express();
 
 
 // Configuración cors y entradas de texto
-const options = {
-    uploadDir: os.tmpdir(),
-    autoClean: true
-};
+// const options = {
+//     uploadDir: os.tmpdir(),
+//     autoClean: true
+// };
 
 app.use(
     // IP Salomé datos
@@ -37,7 +39,7 @@ app.use(
 app.use(Express.static('src/public'));
 app.use('/api', Express.static('src/public'))
 
-app.use(FormData.parse(options))
+// app.use(FormData.parse(options))
 app.use(bodyParser.urlencoded({ extended: false }));
 // Configuración cors y entradas de texto
 
@@ -47,12 +49,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 }); */
 
 // Rutas de API
-app.use(RutasLogin)
+app.use(routesFotos)
+
 app.use(routesEspecializacion)
 app.use(routesServicio)
+// app.use(RutasLogin)
 app.use(routesRaza)
 app.use(routesEspecie)
-app.use(routesFotos)
+app.use(routesVeterinario)
 
 
 // Rutas de API
