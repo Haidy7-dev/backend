@@ -12,6 +12,7 @@ import routesRaza from "./src/routes/raza.js";
 import routesEspecie from "./src/routes/especie.js";
 import routesFotos from "./src/routes/fotos.js";
 import routesVeterinario from "./src/routes/veterinario_o_zootecnista.js";
+import routesHorarios from "./src/routes/horarios.js";
 
 
 const app = Express();
@@ -28,12 +29,12 @@ app.use(
     // cors({ origin: ['http://localhost:3000', 'http://----------'] })
 
     // IP Salomé datos
-    // cors({ origin: ['http://localhost:3000', 'http://10.121.63.130'] })
+    //cors({ origin: ['http://localhost:3000', 'http://10.121.63.130'] })
 
     //IP Haidy casa
     //cors({ origin: ['http://localhost:3000', 'http://192.168.1.16'] })
     //IP Haidy datos
-    cors({ origin: ['http://localhost:3000', 'http://10.164.93.119'] })
+   cors({ origin: ['http://localhost:3000', 'http://10.164.93.119'] })
 );
 
 app.use(Express.static('src/public'));
@@ -57,6 +58,8 @@ app.use(routesServicio)
 app.use(routesRaza)
 app.use(routesEspecie)
 app.use(routesVeterinario)
+app.use(routesHorarios);
+
 
 
 // Rutas de API
