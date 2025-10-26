@@ -1,8 +1,8 @@
 import { pool } from "../../utils/db.js";
 
 /**
- * 🟢 OBTENER TODOS LOS USUARIOS
- * GET /api/usuarios
+ *  OBTENER TODOS LOS USUARIOS
+ * post /api/usuarios
  */
 export const getUsuario = async (req, res) => {
   try {
@@ -18,7 +18,7 @@ export const getUsuario = async (req, res) => {
 };
 
 /**
- * 🟡 CREAR O ACTUALIZAR UN USUARIO
+ *  CREAR O ACTUALIZAR UN USUARIO
  * POST /api/usuarios
  */
 export const postUsuario = async (req, res) => {
