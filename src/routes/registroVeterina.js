@@ -1,10 +1,10 @@
-import express from "express";
-import { postRegistrarVeterina, getRegistroVeterina } from "../controllers/RegistroVeterina.js";
+import { Router } from "express";
+import { getRegistroVeterina, postRegistrarVeterina } from "../controllers/RegistroVeterina.js";
 
-const router = express.Router();
 
-// Ruta POST para registrar veterinario
-router.post("/api/registroVeterina", postRegistrarVeterina);
-router.get("/api/registroVeterina", getRegistroVeterina);
+const routesRegistroVeterina = Router();
 
-export default router;
+routesRegistroVeterina.get("/api/registroVeterina", getRegistroVeterina);
+routesRegistroVeterina.post("/api/registroVeterina", postRegistrarVeterina);
+
+export default routesRegistroVeterina;

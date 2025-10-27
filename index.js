@@ -1,7 +1,9 @@
-import Express from "express";
+import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import { PORT } from "./utils/config.js";
+
+// Importación de rutas
 import routesEspecializacion from "./src/routes/especializaciones.js";
 import routesServicio from "./src/routes/servicio.js";
 import routesRaza from "./src/routes/raza.js";
@@ -10,37 +12,40 @@ import routesFotos from "./src/routes/fotos.js";
 import routesVeterinario from "./src/routes/veterinario_o_zootecnista.js";
 import routesHorarios from "./src/routes/horarios.js";
 import routesUsuario from "./src/routes/usuario.js";
-import routesloginUsuario from "./src/routes/loginUsuario.js";
-import routesloginVeterinario from "./src/routes/loginVeterinario.js";
 import routesregistroVeterina from "./src/routes/registroVeterina.js";
+import routescitasVeterinario from "./src/routes/citasVeterinario.js";
+import routesresumenCitas from "./src/routes/resumenCitas.js";
+import routesCreateCita from "./src/routes/createCita.js";
+import routerRegistroMascota from "./src/routes/registroMascota.js";
+import loginRoutes from "./src/routes/loginRoutes.js";
+import routercitasDueno from "./src/routes/citaDueno.js";
+import routerPerfilMascota from "./src/routes/perfilMascota.js";
+import routerCalificaciones from "./src/routes/crearCalificacion.js";
 
+const app = express();
 
-const app = Express();
-
-// Mantengo tu configuración CORS original (no se cambia)
+// 🧩 Configuración CORS
 app.use(
-    // IP Salomé casa
-    cors({ origin: ['http://localhost:3000', 'http://192.168.101.73'] })
-
-    // IP Salomé datos
-    // cors({ origin: ['http://localhost:3000', 'http://10.121.63.130'] })
-
-    // IP Haidy casa
-    // cors({ origin: ['http://localhost:3000', 'http://192.168.1.16'] })
-
-    // IP Haidy datos
-    // cors({ origin: ['http://localhost:3000', 'http://10.164.93.119'] })
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://192.168.101.73", // ✅ IP de Salomé en casa
+    ],
+  })
 );
 
-// Middlewares
-app.use(Express.json());
+// 🧩 Middlewares principales
+app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// Archivos estáticos
-app.use(Express.static('src/public'));
-app.use('/api', Express.static('src/public'));
+// 🧩 Archivos estáticos
+app.use(express.static("src/public"));
+app.use("/api", express.static("src/public"));
 
-// Rutas de API (todas las que ya tienes)
+// 🧩 Rutas API
+// ⚠️ IMPORTANTE: cada archivo de rutas ya define su propio prefijo.
+// Por eso no uses `app.use("/api", routesRegistroVeterina)` aquí, ya que duplicaría el prefijo.
+
 app.use(routesFotos);
 app.use(routesEspecializacion);
 app.use(routesServicio);
@@ -49,16 +54,31 @@ app.use(routesEspecie);
 app.use(routesVeterinario);
 app.use(routesHorarios);
 app.use(routesUsuario);
-app.use(routesloginUsuario);
-app.use(routesloginVeterinario);
 app.use(routesregistroVeterina);
+app.use(routescitasVeterinario);
+app.use(routesresumenCitas);
+app.use(routesCreateCita);
+app.use(routerRegistroMascota);
+app.use(loginRoutes);
+app.use(routercitasDueno);
+app.use(routerPerfilMascota);
+app.use(routerCalificaciones);
 
-// Ruta base
-app.get('/', (req, res) => {
-  res.send({ data: "Patas sin barreras" });
+// 🧩 Ruta base
+app.get("/", (req, res) => {
+  res.send({ data: "🐾 Patas sin barreras - API Activa" });
 });
 
-// Iniciar servidor
-app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
+// 🧩 Middleware global de errores
+app.use((err, req, res, next) => {
+  console.error("❌ Error global:", err);
+  res.status(500).json({ message: "Error interno del servidor", error: err.message });
+});
+
+// 🧩 Inicio del servidor
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor corriendo en http://192.168.101.73:${PORT}`);
+});
+
 
 

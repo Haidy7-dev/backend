@@ -112,7 +112,7 @@ export const buscarVeterinarios = async (req, res) => {
     const [rows] = await pool.query(sqlQuery, [likeQuery, likeQuery, likeQuery, likeQuery]);
 
     const veterinarios = rows.map(vet => ({
-      id: vet.id, // 👈 corregido aquí
+      id: vet.id, 
       nombre: vet.nombre,
       primer_nombre: vet.primer_nombre,
       segundo_nombre: vet.segundo_nombre || '',
@@ -137,63 +137,59 @@ export const buscarVeterinarios = async (req, res) => {
 /* =========================================================
    OBTENER DETALLE DE VETERINARIO (info + horarios + servicios)
    ========================================================= */
+// getVeterinarioDetalle (mejorado)
 export const getVeterinarioDetalle = async (req, res) => {
   const { id } = req.params;
   try {
-    // 🟢 Información básica del veterinario
+    // Vet básico
     const [vetRows] = await pool.query(
-      `SELECT 
-          id, 
-          CONCAT(primer_nombre, ' ', primer_apellido) AS nombre, 
-          foto, 
-          descripcion_de_perfil
-       FROM veterinario_o_zootecnista 
-       WHERE id = ?`,
+      `SELECT id, primer_nombre, primer_apellido, CONCAT(primer_nombre, ' ', primer_apellido) AS nombre, foto, descripcion_de_perfil
+       FROM veterinario_o_zootecnista WHERE id = ?`,
       [id]
     );
-
-    if (!vetRows.length)
-      return res.status(404).json({ message: "Veterinario no encontrado" });
-
+    if (!vetRows.length) return res.status(404).json({ message: "Veterinario no encontrado" });
     const vet = vetRows[0];
 
-    // 🕓 Horarios del veterinario (si existe la tabla)
-    let horarios = [];
-    try {
-      const [rows] = await pool.query(
-        `SELECT dia_semana, hora_inicio, hora_fin
-         FROM horarios_veterinario
-         WHERE id_veterinario = ?
-         ORDER BY dia_semana, hora_inicio`,
-        [id]
-      );
-      horarios = rows;
-    } catch {
-      console.warn("⚠️ Tabla horarios_veterinario no existe, se omite.");
-    }
-
-    // 💼 Servicios que ofrece (con su precio personalizado)
-    const [servicios] = await pool.query(
-      `SELECT 
-          s.id AS id_servicio,
-          s.nombre,
-          s.duracion,
-          pvs.precio AS precio_veterinario
-       FROM p_veterinario_servicio pvs
-       INNER JOIN servicio s ON pvs.id_servicio = s.id
-       WHERE pvs.id_veterinario_o_zootecnista = ?`,
+    // Especializaciones (vía tabla pivote p_veterinario_o_zootecnista_especializaciones)
+    const [especializaciones] = await pool.query(
+      `SELECT e.id, e.nombre
+       FROM p_veterinario_o_zootecnista_especializaciones pv
+       JOIN especializaciones e ON pv.id_especializaciones = e.id
+       WHERE pv.id_veterinario_o_zootecnista = ?`,
       [id]
     );
 
-    // 📦 Respuesta final
-    res.json({ vet, horarios, servicios });
+    // Horarios (tabla horarios) — devuelve filas con dia_semana, hora_inicio, hora_finalizacion
+    let horarios = [];
+    try {
+      const [horRows] = await pool.query(
+        `SELECT dia_semana, hora_inicio, hora_finalizacion
+         FROM horarios
+         WHERE id_veterinario_o_zootecnista = ?
+         ORDER BY FIELD(dia_semana, 'Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'), hora_inicio`,
+        [id]
+      );
+      horarios = horRows;
+    } catch (err) {
+      console.warn('Tabla horarios no disponible o error:', err.message);
+    }
+
+    // Servicios (pivot p_veterinario_servicio -> servicio)
+    const [servicios] = await pool.query(
+      `SELECT s.id, s.nombre, s.duracion, pvs.precio AS precio_veterinario
+       FROM p_veterinario_servicio pvs
+       JOIN servicio s ON pvs.id_servicio = s.id
+       WHERE pvs.id_veterinario_o_zootecnista = ? AND COALESCE(pvs.precio, s.precio) IS NOT NULL`,
+      [id]
+    );
+
+    res.json({ vet, especializaciones, horarios, servicios });
   } catch (error) {
     console.error("Error al obtener detalle del veterinario:", error);
-    res
-      .status(500)
-      .json({ error: "Error al obtener detalle del veterinario" });
+    res.status(500).json({ error: "Error al obtener detalle del veterinario" });
   }
 };
+
 
 /* =========================================================
    OBTENER CITAS POR DÍA

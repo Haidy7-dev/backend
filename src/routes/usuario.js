@@ -1,9 +1,24 @@
-import { getUsuario, postUsuario } from "../controllers/Usuario.js";
-import { Router } from "express";
+import express from "express";
+import {
+  getUsuario,
+  postUsuario,
+  getUsuarioPorId,
+  actualizarUsuario,
+} from "../controllers/Usuario.js";
 
-const routesUsuario = Router();
+const router = express.Router();
 
-routesUsuario.get("/api/usuario", getUsuario);
-routesUsuario.post("/api/usuario", postUsuario);
+// Obtener todos los usuarios
+router.get("/api/usuario", getUsuario);
 
-export default routesUsuario;
+// Obtener un usuario por ID
+router.get("/api/usuario/:id", getUsuarioPorId);
+
+// Registrar usuario nuevo
+router.post("/api/usuario", postUsuario);
+
+// Actualizar usuario
+router.put("/api/usuario/:id", actualizarUsuario);
+
+export default router;
+
