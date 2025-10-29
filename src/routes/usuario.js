@@ -1,10 +1,5 @@
 import express from "express";
-import {
-  getUsuario,
-  postUsuario,
-  getUsuarioPorId,
-  actualizarUsuario,
-} from "../controllers/Usuario.js";
+import {getUsuario,postUsuario,getUsuarioPorId,actualizarUsuario,} from "../controllers/Usuario.js";
 
 const router = express.Router();
 

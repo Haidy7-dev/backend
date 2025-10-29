@@ -29,7 +29,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "http://192.168.101.73", // ✅ IP de Salomé en casa
+      "http://10.78.175.130", // ✅ IP de Salomé celular
     ],
   })
 );
@@ -77,7 +77,7 @@ app.use((err, req, res, next) => {
 
 // 🧩 Inicio del servidor
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://192.168.101.73:${PORT}`);
+  console.log(`🚀 Servidor corriendo en http://10.78.175.130:${PORT}`);
 });
 
 

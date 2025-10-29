@@ -1,12 +1,12 @@
 import { pool } from "../../utils/db.js";
 
 // --- GET: traer info de la mascota ---
-export const obtenerPerfilMascota = async (req, res) => {
+export const getMascotaPorId = async (req, res) => {
   try {
-    const { idMascota } = req.params;
+    const { id } = req.params;
 
-    // 🐾 Consulta ajustada al nombre real de tu columna: id_mascota
-    const [rows] = await pool.query("SELECT * FROM mascotas WHERE id_mascota = ?", [idMascota]);
+    // Consulta ajustada al nombre real de tu columna: id
+    const [rows] = await pool.query("SELECT * FROM mascota WHERE id = ?", [id]);
 
     if (rows.length === 0) {
       return res.status(404).json({ message: "No se encontró la mascota" });
@@ -14,17 +14,16 @@ export const obtenerPerfilMascota = async (req, res) => {
 
     const mascota = rows[0];
 
-    // 🧩 Ajuste de nombres para que coincida con el frontend
     res.json({
-      id_mascota: mascota.id_mascota,
+      id_mascota: mascota.id,
       nombre: mascota.nombre,
       peso: mascota.peso,
       sexo: mascota.sexo,
-      raza: mascota.raza,
-      foto: mascota.foto,
+      id_raza: mascota.id_raza,
+      id_especie: mascota.id_especie,
     });
   } catch (error) {
-    console.error("❌ Error en obtenerPerfilMascota:", error);
+    console.error("❌ Error en getMascota:", error);
     res.status(500).json({ message: "Error al obtener el perfil de la mascota" });
   }
 };
@@ -32,13 +31,12 @@ export const obtenerPerfilMascota = async (req, res) => {
 // --- PUT: actualizar info de la mascota ---
 export const actualizarPerfilMascota = async (req, res) => {
   try {
-    const { idMascota } = req.params;
-    const { nombre, peso, sexo, raza, foto } = req.body;
+    const { id } = req.params;
+    const { nombre, peso, sexo, id_raza, id_especie } = req.body;
 
-    // 🧩 Actualiza usando la columna id_mascota
     await pool.query(
-      "UPDATE mascotas SET nombre = ?, peso = ?, sexo = ?, raza = ?, foto = ? WHERE id_mascota = ?",
-      [nombre, peso, sexo, raza, foto, idMascota]
+      "UPDATE mascota SET nombre = ?, peso = ?, sexo = ?, id_raza = ?, id_especie = ? WHERE id = ?",
+      [nombre, peso, sexo, id_raza, id_especie, id]
     );
 
     res.json({ message: "Perfil actualizado correctamente" });
@@ -47,5 +45,7 @@ export const actualizarPerfilMascota = async (req, res) => {
     res.status(500).json({ message: "Error al actualizar el perfil de la mascota" });
   }
 };
+
+
 
 

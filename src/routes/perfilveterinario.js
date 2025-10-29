@@ -4,9 +4,9 @@ import {getVeterinarioPorId,actualizarVeterinario,} from "../controllers/PerfilV
 const router = express.Router();
 
 // Obtener veterinario por ID
-router.get("/:id", getVeterinarioPorId);
+router.get("/api/veterinario/:id", getVeterinarioPorId);
 
 // Actualizar datos del veterinario
-router.put("/:id", actualizarVeterinario);
+router.put("/api/veterinario/:id", actualizarVeterinario);
 
 export default router;

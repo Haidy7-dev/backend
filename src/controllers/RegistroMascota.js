@@ -1,9 +1,5 @@
 import { pool } from "../../utils/db.js";
 
-/**
- * Registrar una nueva mascota
- * POST /api/registroMascota
- */
 export const registrarMascota = async (req, res) => {
   try {
     const {
@@ -11,23 +7,22 @@ export const registrarMascota = async (req, res) => {
       sexo,
       peso,
       edad,
-      especie,
-      raza,
-      id_usuario, // dueño de la mascota
+      id_usuario,
+      id_raza,
+      id_especie,
+      foto = "foto.png",
     } = req.body;
 
-    // Validar campos obligatorios
-    if (!nombre || !sexo || !peso || !edad || !especie || !raza || !id_usuario) {
+    if (!nombre || !sexo || !peso || !edad || !id_usuario || !id_raza || !id_especie) {
       return res.status(400).json({
         message: "Faltan campos obligatorios para registrar la mascota.",
       });
     }
 
-    // Guardar en la base de datos
     const [result] = await pool.query(
-      `INSERT INTO mascota (nombre, sexo, peso, edad, especie, raza, id_usuario)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [nombre, sexo, peso, edad, especie, raza, id_usuario]
+      `INSERT INTO mascota (nombre, sexo, peso, edad, id_usuario, id_raza, id_especie, foto)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [nombre, sexo, peso, edad, id_usuario, id_raza, id_especie, foto]
     );
 
     console.log("✅ Mascota registrada con ID:", result.insertId);
@@ -42,10 +37,6 @@ export const registrarMascota = async (req, res) => {
   }
 };
 
-/**
- * Obtener todas las mascotas de un usuario
- * GET /api/registroMascota/:id_usuario
- */
 export const obtenerMascotasPorUsuario = async (req, res) => {
   try {
     const { id_usuario } = req.params;

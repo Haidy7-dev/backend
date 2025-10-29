@@ -3,10 +3,11 @@ import { registrarMascota, obtenerMascotasPorUsuario } from "../controllers/Regi
 
 const routerRegistroMascota = express.Router();
 
-// Ruta para registrar una nueva mascota
-routerRegistroMascota.post("/api", registrarMascota);
+// Registrar nueva mascota
+routerRegistroMascota.post("/api/mascota", registrarMascota);
 
-// Ruta para obtener las mascotas de un usuario
-routerRegistroMascota.get("/api/:id_usuario", obtenerMascotasPorUsuario);
+// Obtener mascotas por usuario
+routerRegistroMascota.get("/api/mascota/:id_usuario", obtenerMascotasPorUsuario);
 
 export default routerRegistroMascota;
+
