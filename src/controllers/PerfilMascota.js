@@ -19,8 +19,10 @@ export const getMascotaPorId = async (req, res) => {
       nombre: mascota.nombre,
       peso: mascota.peso,
       sexo: mascota.sexo,
+      edad: mascota.edad,
       id_raza: mascota.id_raza,
       id_especie: mascota.id_especie,
+      foto: mascota.foto,
     });
   } catch (error) {
     console.error("❌ Error en getMascota:", error);
@@ -32,11 +34,11 @@ export const getMascotaPorId = async (req, res) => {
 export const actualizarPerfilMascota = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, peso, sexo, id_raza, id_especie } = req.body;
+    const { nombre, peso, sexo, edad, id_raza, id_especie } = req.body;
 
     await pool.query(
-      "UPDATE mascota SET nombre = ?, peso = ?, sexo = ?, id_raza = ?, id_especie = ? WHERE id = ?",
-      [nombre, peso, sexo, id_raza, id_especie, id]
+      "UPDATE mascota SET nombre = ?, peso = ?, sexo = ?, edad = ?, id_raza = ?, id_especie = ? WHERE id = ?",
+      [nombre, peso, sexo, edad, id_raza, id_especie, id]
     );
 
     res.json({ message: "Perfil actualizado correctamente" });

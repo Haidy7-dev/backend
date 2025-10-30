@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
 import { PORT } from "./utils/config.js";
 
 // Importación de rutas
@@ -17,12 +16,18 @@ import routescitasVeterinario from "./src/routes/citasVeterinario.js";
 import routesresumenCitas from "./src/routes/resumenCitas.js";
 import routesCreateCita from "./src/routes/createCita.js";
 import routerRegistroMascota from "./src/routes/registroMascota.js";
-import loginRoutes from "./src/routes/loginRoutes.js";
+import authRoutes from "./src/routes/auth.js";
 import routercitasDueno from "./src/routes/citaDueno.js";
 import routerPerfilMascota from "./src/routes/perfilMascota.js";
 import routerCalificaciones from "./src/routes/crearCalificacion.js";
 
+
 const app = express();
+
+app.use((req, res, next) => {
+  console.log(`Request received: ${req.method} ${req.url}`);
+  next();
+});
 
 // 🧩 Configuración CORS
 app.use(
@@ -30,22 +35,18 @@ app.use(
     origin: [
       "http://localhost:3000",
       "http://10.78.175.130", // ✅ IP de Salomé celular
+      "http://localhost:8081",
     ],
   })
 );
 
 // 🧩 Middlewares principales
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-
-// 🧩 Archivos estáticos
-app.use(express.static("src/public"));
-app.use("/api", express.static("src/public"));
+app.use(express.urlencoded({ extended: false }));
 
 // 🧩 Rutas API
 // ⚠️ IMPORTANTE: cada archivo de rutas ya define su propio prefijo.
 // Por eso no uses `app.use("/api", routesRegistroVeterina)` aquí, ya que duplicaría el prefijo.
-
 app.use(routesFotos);
 app.use(routesEspecializacion);
 app.use(routesServicio);
@@ -59,10 +60,16 @@ app.use(routescitasVeterinario);
 app.use(routesresumenCitas);
 app.use(routesCreateCita);
 app.use(routerRegistroMascota);
-app.use(loginRoutes);
+app.use("/api", authRoutes);
 app.use(routercitasDueno);
 app.use(routerPerfilMascota);
 app.use(routerCalificaciones);
+
+
+// 🧩 Archivos estáticos
+app.use(express.static("src/public"));
+app.use("/api", express.static("src/public"));
+app.use("/pethub", express.static("src/fotos"));
 
 // 🧩 Ruta base
 app.get("/", (req, res) => {

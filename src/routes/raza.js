@@ -4,7 +4,7 @@ import { pool } from "../../utils/db.js";
 const routesRaza = Router();
 
 routesRaza.get("/api/raza", async (req, res) => {
-  const query = "SELECT id_raza, nombre, id_especie FROM raza";
+  const query = "SELECT id as id_raza, nombre, id_especie FROM raza";
   try {
     const [rows] = await pool.query(query);
     res.status(200).json(rows);

@@ -2,7 +2,7 @@ import { pool } from "../../utils/db.js";
 
 export const getEspecie = async (req, res) => {
   try {
-    const [result] = await pool.query("SELECT nombre FROM especie");
+    const [result] = await pool.query("SELECT id as id_especie, nombre FROM especie");
     console.log(result);
     res.json(result);
   } catch (err) {
