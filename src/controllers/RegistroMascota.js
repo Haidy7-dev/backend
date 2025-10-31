@@ -10,7 +10,7 @@ export const registrarMascota = async (req, res) => {
       id_usuario,
       id_raza,
       id_especie,
-      foto = "foto.png",
+      foto = "foto1.png",
     } = req.body;
 
     if (!nombre || !sexo || !peso || !edad || !id_usuario || !id_raza || !id_especie) {

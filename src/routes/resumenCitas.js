@@ -8,7 +8,7 @@ const routesresumenCitas = Router();
  * Obtiene el resumen completo de una cita específica
  * La URL completa dependerá del prefijo que pongas en index.js
  */
-routesresumenCitas.get("/api/ResumenCitas/:idCita", getResumenCita);
+routesresumenCitas.get("/:idCita", getResumenCita);
 
 export default routesresumenCitas;
 

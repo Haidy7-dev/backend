@@ -5,21 +5,24 @@ export const getCitasBasicasDueno = async (req, res) => {
     const { idDueno } = req.params;
 
     const [rows] = await pool.query(`
-      SELECT 
+      SELECT
         c.id,
         c.fecha,
         c.hora_inicio,
         c.hora_finalizacion,
         c.id_estado_cita,
+        c.id_veterinario_o_zootecnista,
         m.nombre AS nombre_mascota,
         s.nombre AS nombre_servicio,
         v.primer_nombre AS nombre_veterinario_o_zootecnista,
-        m.foto
+        m.foto,
+        CASE WHEN cal.id IS NOT NULL THEN 1 ELSE 0 END AS calificada
       FROM citas c
       INNER JOIN mascota m ON c.id_mascota = m.id
       INNER JOIN servicio s ON c.id_servicio = s.id
       INNER JOIN veterinario_o_zootecnista v ON c.id_veterinario_o_zootecnista = v.id
-      WHERE m.id_usuario = ?
+      LEFT JOIN calificaciones cal ON cal.id_veterinario_o_zootecnista = v.id AND cal.id_usuario = c.id_usuario AND cal.id_servicio = s.id
+      WHERE c.id_usuario = ?
       ORDER BY c.fecha DESC
     `, [idDueno]);
 
@@ -36,7 +39,41 @@ export const actualizarEstadoCitaDueno = async (req, res) => {
     const { id } = req.params;
     const { estado } = req.body;
 
-    await pool.query("UPDATE citas SET estado = ? WHERE id_cita = ?", [estado, id]);
+    if (!estado) {
+      return res.status(400).json({ error: "El estado es requerido." });
+    }
+
+    const [result] = await pool.query("UPDATE citas SET id_estado_cita = ? WHERE id = ?", [estado, id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Cita no encontrada." });
+    }
+
+    // Si la cita se marca como completada (estado 2), crear el resumen
+    if (estado == 2) {
+      // Obtener datos de la cita para calcular el resumen
+      const [citaRows] = await pool.query(`
+        SELECT c.hora_inicio, c.hora_finalizacion, s.precio
+        FROM citas c
+        JOIN servicio s ON c.id_servicio = s.id
+        WHERE c.id = ?
+      `, [id]);
+
+      if (citaRows.length > 0) {
+        const { hora_inicio, hora_finalizacion, precio } = citaRows[0];
+        const precioNum = parseFloat(precio);
+        const iva = precioNum * 0.19; // Asumiendo IVA del 19%
+        const total = precioNum + iva;
+        const modalidad = "Presencial"; // Asumiendo modalidad por defecto
+
+        // Insertar en resumen_citas
+        await pool.query(`
+          INSERT INTO resumen_citas (modalidad, hora_inicio, hora_finalizacion, iva, total, id_cita)
+          VALUES (?, ?, ?, ?, ?, ?)
+        `, [modalidad, hora_inicio, hora_finalizacion, iva, total, id]);
+      }
+    }
+
     res.json({ message: "✅ Estado actualizado correctamente" });
   } catch (error) {
     console.error("❌ Error al actualizar estado de la cita:", error);

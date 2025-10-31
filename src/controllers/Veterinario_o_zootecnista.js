@@ -176,7 +176,7 @@ export const getVeterinarioDetalle = async (req, res) => {
 
     // Servicios (pivot p_veterinario_servicio -> servicio)
     const [servicios] = await pool.query(
-      `SELECT s.id, s.nombre, s.duracion, pvs.precio AS precio_veterinario
+      `SELECT s.id, s.nombre, s.duracion, COALESCE(pvs.precio, s.precio) AS precio
        FROM p_veterinario_servicio pvs
        JOIN servicio s ON pvs.id_servicio = s.id
        WHERE pvs.id_veterinario_o_zootecnista = ? AND COALESCE(pvs.precio, s.precio) IS NOT NULL`,

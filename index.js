@@ -34,7 +34,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "http://10.78.175.130", // ✅ IP de Salomé celular
+      "http://10.164.93.130", // ✅ IP 
       "http://localhost:8081",
     ],
   })
@@ -57,7 +57,7 @@ app.use(routesHorarios);
 app.use(routesUsuario);
 app.use(routesregistroVeterina);
 app.use(routescitasVeterinario);
-app.use(routesresumenCitas);
+app.use("/api/resumencitas", routesresumenCitas);
 app.use(routesCreateCita);
 app.use(routerRegistroMascota);
 app.use("/api", authRoutes);
@@ -84,7 +84,7 @@ app.use((err, req, res, next) => {
 
 // 🧩 Inicio del servidor
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://10.78.175.130:${PORT}`);
+  console.log(`🚀 Servidor corriendo en http://10.164.93.130:${PORT}`);
 });
 
 
