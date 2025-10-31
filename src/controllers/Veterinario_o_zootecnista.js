@@ -62,7 +62,7 @@ export const getVeterinarios = async (req, res) => {
 };
 
 /* =========================================================
-   BUSCAR VETERINARIOS POR NOMBRE
+   BUSCAR VETERINARIOS POR NOMBRE, SERVICIO O ESPECIALIDAD
    ========================================================= */
 export const buscarVeterinarios = async (req, res) => {
   try {
@@ -73,7 +73,7 @@ export const buscarVeterinarios = async (req, res) => {
     }
 
     const sqlQuery = `
-      SELECT 
+      SELECT DISTINCT
         v.id,
         v.primer_nombre,
         v.segundo_nombre,
@@ -89,30 +89,36 @@ export const buscarVeterinarios = async (req, res) => {
         COUNT(c.id) AS total_resenas
       FROM veterinario_o_zootecnista v
       LEFT JOIN calificaciones c ON v.id = c.id_veterinario_o_zootecnista
-      WHERE 
+      LEFT JOIN p_veterinario_servicio pvs ON v.id = pvs.id_veterinario_o_zootecnista
+      LEFT JOIN servicio s ON pvs.id_servicio = s.id
+      LEFT JOIN p_veterinario_o_zootecnista_especializaciones pve ON v.id = pve.id_veterinario_o_zootecnista
+      LEFT JOIN especializaciones e ON pve.id_especializaciones = e.id
+      WHERE
         LOWER(CONCAT(v.primer_nombre, ' ', v.primer_apellido)) LIKE LOWER(?) OR
         LOWER(CONCAT(v.primer_nombre, ' ', COALESCE(v.segundo_nombre, ''), ' ', v.primer_apellido, ' ', COALESCE(v.segundo_apellido, ''))) LIKE LOWER(?) OR
         LOWER(v.primer_nombre) LIKE LOWER(?) OR
-        LOWER(v.primer_apellido) LIKE LOWER(?)
-      GROUP BY 
-        v.id, 
-        v.primer_nombre, 
-        v.segundo_nombre, 
-        v.primer_apellido, 
-        v.segundo_apellido, 
-        v.foto, 
-        v.correo_electronico, 
-        v.telefono, 
-        v.direccion_clinica, 
+        LOWER(v.primer_apellido) LIKE LOWER(?) OR
+        LOWER(s.nombre) LIKE LOWER(?) OR
+        LOWER(e.nombre) LIKE LOWER(?)
+      GROUP BY
+        v.id,
+        v.primer_nombre,
+        v.segundo_nombre,
+        v.primer_apellido,
+        v.segundo_apellido,
+        v.foto,
+        v.correo_electronico,
+        v.telefono,
+        v.direccion_clinica,
         v.descripcion_de_perfil
       ORDER BY promedio_calificaciones DESC, total_resenas DESC
     `;
 
     const likeQuery = `%${query}%`;
-    const [rows] = await pool.query(sqlQuery, [likeQuery, likeQuery, likeQuery, likeQuery]);
+    const [rows] = await pool.query(sqlQuery, [likeQuery, likeQuery, likeQuery, likeQuery, likeQuery, likeQuery]);
 
     const veterinarios = rows.map(vet => ({
-      id: vet.id, 
+      id: vet.id,
       nombre: vet.nombre,
       primer_nombre: vet.primer_nombre,
       segundo_nombre: vet.segundo_nombre || '',

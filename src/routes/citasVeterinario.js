@@ -7,7 +7,7 @@ const routescitasVeterinario = express.Router();
 routescitasVeterinario.get("/api/citasVeterinario/:idVet", getCitasBasicasVeterinario);
 
 // Actualizar estado de una cita específica
-routescitasVeterinario.put("/api/citas/:id", actualizarEstadoCita);
+routescitasVeterinario.put("/api/citasVeterinario/:id/estado", actualizarEstadoCita);
 
 export default routescitasVeterinario;
 

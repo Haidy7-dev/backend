@@ -6,7 +6,7 @@ export const getResumenCita = async (req, res) => {
   try {
     const [rows] = await pool.query(
       `
-      SELECT 
+      SELECT
           r.id AS id_resumen,
           r.modalidad,
           r.hora_inicio,
@@ -18,6 +18,10 @@ export const getResumenCita = async (req, res) => {
           -- 🐶 Datos de la mascota
           m.nombre AS nombre_mascota,
           m.sexo AS sexo_mascota,
+          m.foto AS fotoMascota,
+
+          -- Calificación
+          CASE WHEN cal.id IS NOT NULL THEN 1 ELSE 0 END AS calificada,
 
           -- 💼 Datos del servicio
           s.nombre AS nombre_servicio,
@@ -30,14 +34,20 @@ export const getResumenCita = async (req, res) => {
           -- 👨‍⚕️ Datos del veterinario o zootecnista
           CONCAT(v.primer_nombre, ' ', v.primer_apellido) AS nombre_veterinario,
           v.correo_electronico AS correo_veterinario,
-          v.direccion_clinica AS direccion_clinica
+
+          -- 📍 Lugar de la cita
+          CASE
+              WHEN r.modalidad = 'En casa' THEN u.direccion
+              ELSE v.direccion_clinica
+          END AS lugar
 
       FROM resumen_citas r
-      JOIN citas c ON r.id_cita = c.id
-      JOIN mascota m ON c.id_mascota = m.id
-      JOIN servicio s ON c.id_servicio = s.id
-      JOIN usuario u ON c.id_usuario = u.id
-      JOIN veterinario_o_zootecnista v ON c.id_veterinario_o_zootecnista = v.id
+      LEFT JOIN citas c ON r.id_cita = c.id
+      LEFT JOIN mascota m ON c.id_mascota = m.id
+      LEFT JOIN servicio s ON c.id_servicio = s.id
+      LEFT JOIN usuario u ON c.id_usuario = u.id
+      LEFT JOIN veterinario_o_zootecnista v ON c.id_veterinario_o_zootecnista = v.id
+      LEFT JOIN calificaciones cal ON cal.id_usuario = c.id_usuario AND cal.id_veterinario_o_zootecnista = c.id_veterinario_o_zootecnista AND cal.id_servicio = c.id_servicio
       WHERE r.id_cita = ?
       `,
       [idCita]

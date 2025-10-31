@@ -49,28 +49,38 @@ export const actualizarEstadoCitaDueno = async (req, res) => {
       return res.status(404).json({ error: "Cita no encontrada." });
     }
 
-    // Si la cita se marca como completada (estado 2), crear el resumen
+    // Si la cita se marca como completada (estado 2), crear el resumen si no existe
     if (estado == 2) {
-      // Obtener datos de la cita para calcular el resumen
-      const [citaRows] = await pool.query(`
-        SELECT c.hora_inicio, c.hora_finalizacion, s.precio
-        FROM citas c
-        JOIN servicio s ON c.id_servicio = s.id
-        WHERE c.id = ?
-      `, [id]);
+      // Verificar si ya existe un resumen para esta cita
+      const [existingResumen] = await pool.query("SELECT id FROM resumen_citas WHERE id_cita = ?", [id]);
 
-      if (citaRows.length > 0) {
-        const { hora_inicio, hora_finalizacion, precio } = citaRows[0];
-        const precioNum = parseFloat(precio);
-        const iva = precioNum * 0.19; // Asumiendo IVA del 19%
-        const total = precioNum + iva;
-        const modalidad = "Presencial"; // Asumiendo modalidad por defecto
+      if (existingResumen.length === 0) {
+        // Obtener datos de la cita para calcular el resumen
+        const [citaRows] = await pool.query(`
+          SELECT
+              c.hora_inicio,
+              c.hora_finalizacion,
+              s.precio,
+              s.modalidad,
+              u.direccion
+          FROM citas c
+          JOIN servicio s ON c.id_servicio = s.id
+          JOIN usuario u ON c.id_usuario = u.id
+          WHERE c.id = ?
+        `, [id]);
 
-        // Insertar en resumen_citas
-        await pool.query(`
-          INSERT INTO resumen_citas (modalidad, hora_inicio, hora_finalizacion, iva, total, id_cita)
-          VALUES (?, ?, ?, ?, ?, ?)
-        `, [modalidad, hora_inicio, hora_finalizacion, iva, total, id]);
+        if (citaRows.length > 0) {
+          const { hora_inicio, hora_finalizacion, precio, modalidad, direccion } = citaRows[0];
+          const precioNum = parseFloat(precio);
+          const iva = 19; // IVA del 19%
+          const total = precioNum * (1 + iva / 100);
+
+          // Insertar en resumen_citas
+          await pool.query(`
+            INSERT INTO resumen_citas (modalidad, hora_inicio, hora_finalizacion, iva, total, id_cita)
+            VALUES (?, ?, ?, ?, ?, ?)
+          `, [modalidad, hora_inicio, hora_finalizacion, iva, total, id]);
+        }
       }
     }
 

@@ -24,6 +24,7 @@ export const loginUsuario = async (req, res) => {
 
     // 3. Comparar la contraseña enviada con el hash de la BD
     const passwordMatches = await bcrypt.compare(contrasena, user.contrasena);
+    console.log(`Password match result for ${correo_electronico}: ${passwordMatches}`);
 
     if (!passwordMatches) {
       return res.status(401).json({ message: "Correo o contraseña incorrectos." });
