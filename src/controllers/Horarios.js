@@ -6,7 +6,7 @@ export const getHorarios = async (req, res) => {
     const [rows] = await pool.query(
       `SELECT * 
        FROM horarios 
-       ORDER BY FIELD(dia_semana,'Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo')`
+       ORDER BY FIELD(dia_semana,'Lunes','Miércoles','Martes','Jueves','Viernes','Sábado','Domingo')`
     );
     res.json(rows);
   } catch (error) {
@@ -18,17 +18,17 @@ export const getHorarios = async (req, res) => {
 // 📌 Crear un nuevo horario
 export const createHorario = async (req, res) => {
   try {
-    const { dia_semana, hora_inicio, hora_finalizacion } = req.body;
+    const { dia_semana, hora_inicio, hora_finalizacion, id_veterinario_o_zootecnista } = req.body;
 
-    if (!dia_semana || !hora_inicio || !hora_finalizacion) {
+    if (!dia_semana || !hora_inicio || !hora_finalizacion || !id_veterinario_o_zootecnista) {
       return res.status(400).json({
-        message: "Faltan datos obligatorios: día, hora de inicio o finalización",
+        message: "Faltan datos obligatorios: día, hora de inicio, finalización o ID del veterinario",
       });
     }
 
     const [result] = await pool.query(
-      "INSERT INTO horarios (dia_semana, hora_inicio, hora_finalizacion) VALUES (?, ?, ?)",
-      [dia_semana, hora_inicio, hora_finalizacion]
+      "INSERT INTO horarios (dia_semana, hora_inicio, hora_finalizacion, id_veterinario_o_zootecnista) VALUES (?, ?, ?, ?)",
+      [dia_semana, hora_inicio, hora_finalizacion, id_veterinario_o_zootecnista]
     );
 
     res.status(201).json({
