@@ -34,7 +34,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "http://172.23.15.112", // ✅ IP 
+      "http://192.168.101.73", // ✅ IP 
       "http://localhost:8081",
     ],
   })
@@ -84,7 +84,7 @@ app.use((err, req, res, next) => {
 
 // 🧩 Inicio del servidor
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://172.23.15.112:${PORT}`);
+  console.log(`🚀 Servidor corriendo en http://192.168.101.73:${PORT}`);
 });
 
 

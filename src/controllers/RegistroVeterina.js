@@ -61,7 +61,7 @@ export const postRegistrarVeterina = async (req, res) => {
         telefono || null,
         direccion_clinica || null,
         hashedPassword, // Use the hashed password
-        null, // Default foto to null
+        'foto.png', // Default foto to foto.png
       ]
     );
 

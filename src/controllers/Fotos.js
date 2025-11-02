@@ -36,7 +36,7 @@ export const subirFotoVeterinario = [
       }
 
       const { id } = req.params;
-      const ruta = `/fotos/${req.file.filename}`;
+      const ruta = req.file.filename;
 
       await pool.query(
         "UPDATE veterinario_o_zootecnista SET foto = ? WHERE id = ?",
@@ -63,7 +63,7 @@ export const subirFotoUsuario = [
         return res.status(400).json({ error: "No se envió ninguna foto" });
 
       const { id } = req.params;
-      const ruta = `/fotos/${req.file.filename}`;
+      const ruta = req.file.filename;
       await pool.query("UPDATE usuario SET foto = ? WHERE id = ?", [ruta, id]);
       res.json({ message: "Foto del usuario guardada", ruta });
     } catch (error) {
@@ -81,7 +81,7 @@ export const subirFotoMascota = [
         return res.status(400).json({ error: "No se envió ninguna foto" });
 
       const { id } = req.params;
-      const ruta = `/fotos/${req.file.filename}`;
+      const ruta = req.file.filename;
       await pool.query("UPDATE mascota SET foto = ? WHERE id = ?", [ruta, id]);
       res.json({ message: "Foto de la mascota guardada", ruta });
     } catch (error) {

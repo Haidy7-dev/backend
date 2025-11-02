@@ -85,11 +85,7 @@ export const deleteHorario = async (req, res) => {
 export const deleteHorariosByVetId = async (req, res) => {
   try {
     const { id_veterinario_o_zootecnista } = req.params;
-    const [result] = await pool.query("DELETE FROM horarios WHERE id_veterinario_o_zootecnista = ?", [id_veterinario_o_zootecnista]);
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "No se encontraron horarios para este veterinario" });
-    }
+    await pool.query("DELETE FROM horarios WHERE id_veterinario_o_zootecnista = ?", [id_veterinario_o_zootecnista]);
 
     res.json({ message: `Horarios para el veterinario ${id_veterinario_o_zootecnista} eliminados correctamente` });
   } catch (error) {
