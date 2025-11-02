@@ -19,9 +19,12 @@ export const getVeterinarios = async (req, res) => {
         v.descripcion_de_perfil,
         CONCAT(v.primer_nombre, ' ', v.primer_apellido) AS nombre,
         COALESCE(ROUND(AVG(c.puntaje), 1), 0) AS promedio_calificaciones,
-        COUNT(c.id) AS total_resenas
+        COUNT(c.id) AS total_resenas,
+        GROUP_CONCAT(DISTINCT s.nombre SEPARATOR ', ') AS servicios_ofrecidos
       FROM veterinario_o_zootecnista v
       LEFT JOIN calificaciones c ON v.id = c.id_veterinario_o_zootecnista
+      LEFT JOIN p_veterinario_servicio pvs ON v.id = pvs.id_veterinario_o_zootecnista
+      LEFT JOIN servicio s ON pvs.id_servicio = s.id
       GROUP BY 
         v.id, 
         v.primer_nombre, 
@@ -51,7 +54,8 @@ export const getVeterinarios = async (req, res) => {
       direccion_clinica: vet.direccion_clinica,
       descripcion_de_perfil: vet.descripcion_de_perfil || '',
       promedio_calificaciones: parseFloat(vet.promedio_calificaciones).toFixed(1),
-      total_resenas: parseInt(vet.total_resenas)
+      total_resenas: parseInt(vet.total_resenas),
+      servicios_ofrecidos: vet.servicios_ofrecidos || ''
     }));
 
     res.json(veterinarios);
@@ -86,7 +90,8 @@ export const buscarVeterinarios = async (req, res) => {
         v.descripcion_de_perfil,
         CONCAT(v.primer_nombre, ' ', v.primer_apellido) AS nombre,
         COALESCE(ROUND(AVG(c.puntaje), 1), 0) AS promedio_calificaciones,
-        COUNT(c.id) AS total_resenas
+        COUNT(c.id) AS total_resenas,
+        GROUP_CONCAT(DISTINCT s.nombre SEPARATOR ', ') AS servicios_ofrecidos
       FROM veterinario_o_zootecnista v
       LEFT JOIN calificaciones c ON v.id = c.id_veterinario_o_zootecnista
       LEFT JOIN p_veterinario_servicio pvs ON v.id = pvs.id_veterinario_o_zootecnista
@@ -130,7 +135,8 @@ export const buscarVeterinarios = async (req, res) => {
       direccion_clinica: vet.direccion_clinica,
       descripcion_de_perfil: vet.descripcion_de_perfil || '',
       promedio_calificaciones: parseFloat(vet.promedio_calificaciones).toFixed(1),
-      total_resenas: parseInt(vet.total_resenas)
+      total_resenas: parseInt(vet.total_resenas),
+      servicios_ofrecidos: vet.servicios_ofrecidos || ''
     }));
 
     res.json(veterinarios);
@@ -187,7 +193,7 @@ export const getVeterinarioDetalle = async (req, res) => {
       `SELECT s.id, s.nombre, s.duracion, COALESCE(pvs.precio, s.precio) AS precio
        FROM p_veterinario_servicio pvs
        JOIN servicio s ON pvs.id_servicio = s.id
-       WHERE pvs.id_veterinario_o_zootecnista = ? AND COALESCE(pvs.precio, s.precio) IS NOT NULL`,
+       WHERE pvs.id_veterinario_o_zootecnista = ?`,
       [id]
     );
 
@@ -214,6 +220,7 @@ export const updateVeterinarioProfile = async (req, res) => {
     especializacion,
     informacion,
     foto,
+    servicios,
   } = req.body;
 
   try {
@@ -238,6 +245,23 @@ export const updateVeterinarioProfile = async (req, res) => {
         await pool.query(
           "INSERT INTO p_veterinario_o_zootecnista_especializaciones (id_veterinario_o_zootecnista, id_especializaciones) VALUES (?, ?)",
           [id, espResult[0].id]
+        );
+      }
+    }
+
+    // Actualizar servicios (eliminar existentes y insertar nuevos con precios)
+    if (servicios && Array.isArray(servicios)) {
+      // Primero, eliminar servicios existentes para este veterinario
+      await pool.query(
+        "DELETE FROM p_veterinario_servicio WHERE id_veterinario_o_zootecnista = ?",
+        [id]
+      );
+      // Luego, insertar los nuevos servicios con sus precios
+      for (const servicio of servicios) {
+        const precio = parseFloat(servicio.precio) || 0;
+        await pool.query(
+          "INSERT INTO p_veterinario_servicio (id_veterinario_o_zootecnista, id_servicio, precio) VALUES (?, ?, ?)",
+          [id, servicio.id, precio]
         );
       }
     }

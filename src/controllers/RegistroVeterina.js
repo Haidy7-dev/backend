@@ -26,7 +26,7 @@ export const postRegistrarVeterina = async (req, res) => {
       direccion_clinica,
       contrasena,
       especializacion,
-      servicio,
+      servicios,
     } = req.body;
 
     if (!id || !primer_nombre || !primer_apellido || !correo_electronico || !contrasena) {
@@ -71,11 +71,11 @@ export const postRegistrarVeterina = async (req, res) => {
     let idEspecializacion = null;
     if (especializacion) {
       const [especializacionResult] = await pool.query(
-        "SELECT id_especializaciones FROM especializaciones WHERE nombre_especializacion = ?",
+        "SELECT id FROM especializaciones WHERE nombre = ?",
         [especializacion]
       );
       if (especializacionResult.length > 0) {
-        idEspecializacion = especializacionResult[0].id_especializaciones;
+        idEspecializacion = especializacionResult[0].id;
         console.log("Attempting to assign especializacion with ID:", idEspecializacion);
         await pool.query(
           "INSERT INTO p_veterinario_o_zootecnista_especializaciones (id_veterinario_o_zootecnista, id_especializaciones) VALUES (?, ?)",
@@ -87,22 +87,14 @@ export const postRegistrarVeterina = async (req, res) => {
       }
     }
 
-    let idServicio = null;
-    if (servicio) {
-      const [servicioResult] = await pool.query(
-        "SELECT id_servicio FROM servicio WHERE nombre_servicio = ?",
-        [servicio]
-      );
-      if (servicioResult.length > 0) {
-        idServicio = servicioResult[0].id_servicio;
-        console.log("Attempting to assign servicio with ID:", idServicio);
+    if (servicios && Array.isArray(servicios) && servicios.length > 0) {
+      for (const id_servicio of servicios) {
+        console.log("Attempting to assign servicio with ID:", id_servicio);
         await pool.query(
-          "INSERT INTO p_veterinario_servicio (id_veterinario_o_zootecnista, id_servicio) VALUES (?, ?)",
-          [id, idServicio]
+          "INSERT INTO p_veterinario_servicio (id_veterinario_o_zootecnista, id_servicio, precio) VALUES (?, ?, 0)",
+          [id, id_servicio]
         );
-        console.log("✅ Servicio asignado");
-      } else {
-        console.warn("⚠️ Servicio no encontrado:", servicio);
+        console.log("✅ Servicio asignado:", id_servicio);
       }
     }
 
