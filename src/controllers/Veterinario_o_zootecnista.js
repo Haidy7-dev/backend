@@ -183,7 +183,7 @@ export const getVeterinarioDetalle = async (req, res) => {
         `SELECT dia_semana, hora_inicio, hora_finalizacion
          FROM horarios
          WHERE id_veterinario_o_zootecnista = ?
-         ORDER BY FIELD(dia_semana, 'Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'), hora_inicio`,
+         ORDER BY FIELD(dia_semana, 'Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'), hora_inicio`,
         [id]
       );
       horarios = horRows;

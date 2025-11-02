@@ -12,6 +12,7 @@ export const getCitasBasicasDueno = async (req, res) => {
         c.hora_finalizacion,
         c.id_estado_cita,
         c.id_veterinario_o_zootecnista,
+        c.id_servicio,
         m.nombre AS nombre_mascota,
         s.nombre AS nombre_servicio,
         v.primer_nombre AS nombre_veterinario_o_zootecnista,
@@ -87,6 +88,6 @@ export const actualizarEstadoCitaDueno = async (req, res) => {
     res.json({ message: "✅ Estado actualizado correctamente" });
   } catch (error) {
     console.error("❌ Error al actualizar estado de la cita:", error);
-    res.status(500).json({ error: "Error al actualizar estado" });
+    res.status(500).json({ error: "Error al actualizar estado", message: error.message });
   }
 };

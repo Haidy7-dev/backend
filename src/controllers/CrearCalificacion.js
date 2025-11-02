@@ -2,23 +2,11 @@ import { pool } from "../../utils/db.js";
 
 export const CrearCalificacion = async (req, res) => {
   try {
-    const { puntaje, id_cita, id_usuario } = req.body;
+    const { puntaje, id_cita, id_usuario, id_veterinario_o_zootecnista, id_servicio } = req.body;
 
-    if (!puntaje || !id_cita || !id_usuario) {
-      return res.status(400).json({ message: "Faltan datos obligatorios" });
+    if (!puntaje || !id_cita || !id_usuario || !id_veterinario_o_zootecnista || !id_servicio) {
+      return res.status(400).json({ message: "Faltan datos obligatorios para la calificación" });
     }
-
-    // Obtener id_veterinario_o_zootecnista y id_servicio desde la cita
-    const [citaRows] = await pool.query(
-      `SELECT id_veterinario_o_zootecnista, id_servicio FROM citas WHERE id = ?`,
-      [id_cita]
-    );
-
-    if (citaRows.length === 0) {
-      return res.status(404).json({ message: "Cita no encontrada" });
-    }
-
-    const { id_veterinario_o_zootecnista, id_servicio } = citaRows[0];
 
     // Insertar la calificación
     const [result] = await pool.query(
