@@ -20,6 +20,7 @@ export const getUsuario = async (req, res) => {
 export const getUsuarioPorId = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("Attempting to retrieve user with ID:", id); // Add this line
     const [rows] = await pool.query("SELECT * FROM usuario WHERE id = ?", [id]);
 
     if (rows.length === 0) {

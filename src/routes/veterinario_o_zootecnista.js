@@ -4,6 +4,7 @@ import {
   buscarVeterinarios,
   getVeterinarioDetalle,
   getCitasDia,
+  updateVeterinarioProfile,
 } from "../controllers/Veterinario_o_zootecnista.js";
 
 const routesVeterinario = Router();
@@ -16,6 +17,9 @@ routesVeterinario.get("/api/veterinarios/buscar", buscarVeterinarios);
 
 // Obtener veterinario por ID (detalle + horarios + servicios)
 routesVeterinario.get("/api/veterinarios/detalle/:id", getVeterinarioDetalle);
+
+// Actualizar perfil de veterinario
+routesVeterinario.put("/api/veterinarios/:id", updateVeterinarioProfile);
 
 // Obtener las citas de un veterinario
 routesVeterinario.get("/api/veterinarios/:id/citas", getCitasDia);

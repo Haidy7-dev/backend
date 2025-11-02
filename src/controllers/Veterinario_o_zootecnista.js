@@ -149,12 +149,13 @@ export const getVeterinarioDetalle = async (req, res) => {
   try {
     // Vet básico
     const [vetRows] = await pool.query(
-      `SELECT id, primer_nombre, primer_apellido, CONCAT(primer_nombre, ' ', primer_apellido) AS nombre, foto, descripcion_de_perfil
+      `SELECT id, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, correo_electronico, telefono, CONCAT(primer_nombre, ' ', primer_apellido) AS nombre, foto, descripcion_de_perfil
        FROM veterinario_o_zootecnista WHERE id = ?`,
       [id]
     );
     if (!vetRows.length) return res.status(404).json({ message: "Veterinario no encontrado" });
     const vet = vetRows[0];
+    console.log("Fetched vet foto:", vet.foto); // Add this line
 
     // Especializaciones (vía tabla pivote p_veterinario_o_zootecnista_especializaciones)
     const [especializaciones] = await pool.query(
@@ -164,6 +165,7 @@ export const getVeterinarioDetalle = async (req, res) => {
        WHERE pv.id_veterinario_o_zootecnista = ?`,
       [id]
     );
+    console.log("Fetched especializaciones:", especializaciones); // Add this line
 
     // Horarios (tabla horarios) — devuelve filas con dia_semana, hora_inicio, hora_finalizacion
     let horarios = [];
@@ -196,6 +198,56 @@ export const getVeterinarioDetalle = async (req, res) => {
   }
 };
 
+
+/* =========================================================
+   ACTUALIZAR PERFIL DE VETERINARIO
+   ========================================================= */
+export const updateVeterinarioProfile = async (req, res) => {
+  const { id } = req.params;
+  const {
+    primer_nombre,
+    segundo_nombre,
+    primer_apellido,
+    segundo_apellido,
+    correo_electronico,
+    telefono,
+    especializacion,
+    informacion,
+    foto,
+  } = req.body;
+
+  try {
+    // Actualizar datos básicos del veterinario
+    await pool.query(
+      `UPDATE veterinario_o_zootecnista
+       SET primer_nombre = ?, segundo_nombre = ?, primer_apellido = ?, segundo_apellido = ?, correo_electronico = ?, telefono = ?, descripcion_de_perfil = ?, foto = ?
+       WHERE id = ?`,
+      [primer_nombre, segundo_nombre || null, primer_apellido, segundo_apellido || null, correo_electronico, telefono, informacion, foto, id]
+    );
+
+    // Actualizar especialización (asumiendo que solo hay una o se actualiza la principal)
+    if (especializacion) {
+      // Primero, eliminar especializaciones existentes para este veterinario
+      await pool.query(
+        "DELETE FROM p_veterinario_o_zootecnista_especializaciones WHERE id_veterinario_o_zootecnista = ?",
+        [id]
+      );
+      // Luego, insertar la nueva especialización
+      const [espResult] = await pool.query("SELECT id FROM especializaciones WHERE nombre = ?", [especializacion]);
+      if (espResult.length > 0) {
+        await pool.query(
+          "INSERT INTO p_veterinario_o_zootecnista_especializaciones (id_veterinario_o_zootecnista, id_especializaciones) VALUES (?, ?)",
+          [id, espResult[0].id]
+        );
+      }
+    }
+
+    res.status(200).json({ message: "Perfil actualizado correctamente." });
+  } catch (error) {
+    console.error("Error al actualizar perfil de veterinario:", error);
+    res.status(500).json({ error: "Error al actualizar perfil de veterinario" });
+  }
+};
 
 /* =========================================================
    OBTENER CITAS POR DÍA
