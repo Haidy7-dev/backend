@@ -19,7 +19,8 @@ export const getCitasBasicasVeterinario = async (req, res) => {
        FROM citas c
        JOIN mascota m ON c.id_mascota = m.id
        JOIN servicio s ON c.id_servicio = s.id
-       WHERE c.id_veterinario_o_zootecnista = ?`,
+       WHERE c.id_veterinario_o_zootecnista = ?
+       ORDER BY c.fecha DESC`,
       [idVet]
     );
 
