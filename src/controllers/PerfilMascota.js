@@ -34,11 +34,11 @@ export const getMascotaPorId = async (req, res) => {
 export const actualizarPerfilMascota = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nombre, peso, sexo, edad, id_raza, id_especie } = req.body;
+    const { nombre, peso, sexo, edad, id_raza, foto } = req.body;
 
     await pool.query(
-      "UPDATE mascota SET nombre = ?, peso = ?, sexo = ?, edad = ?, id_raza = ?, id_especie = ? WHERE id = ?",
-      [nombre, peso, sexo, edad, id_raza, id_especie, id]
+      "UPDATE mascota SET nombre = ?, peso = ?, sexo = ?, edad = ?, id_raza = ?, foto = ? WHERE id = ?",
+      [nombre, peso, sexo, edad, id_raza, foto, id]
     );
 
     res.json({ message: "Perfil actualizado correctamente" });

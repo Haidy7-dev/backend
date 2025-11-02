@@ -61,7 +61,7 @@ export const getVeterinarios = async (req, res) => {
     res.json(veterinarios);
   } catch (error) {
     console.error('Error al obtener veterinarios:', error);
-    res.status(500).json({ error: 'Error al obtener los veterinarios' });
+    res.status(500).json({ error: 'Error al obtener los veterinarios', message: error.message });
   }
 };
 
@@ -142,7 +142,7 @@ export const buscarVeterinarios = async (req, res) => {
     res.json(veterinarios);
   } catch (error) {
     console.error('Error al buscar veterinarios:', error);
-    res.status(500).json({ error: 'Error al buscar veterinarios' });
+    res.status(500).json({ error: 'Error al buscar veterinarios', message: error.message });
   }
 };
 
@@ -153,10 +153,13 @@ export const buscarVeterinarios = async (req, res) => {
 export const getVeterinarioDetalle = async (req, res) => {
   const { id } = req.params;
   try {
-    // Vet básico
+    // Vet básico con promedio de calificaciones
     const [vetRows] = await pool.query(
-      `SELECT id, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, correo_electronico, telefono, CONCAT(primer_nombre, ' ', primer_apellido) AS nombre, foto, descripcion_de_perfil
-       FROM veterinario_o_zootecnista WHERE id = ?`,
+      `SELECT v.id, v.primer_nombre, v.segundo_nombre, v.primer_apellido, v.segundo_apellido, v.correo_electronico, v.telefono, CONCAT(v.primer_nombre, ' ', v.primer_apellido) AS nombre, v.foto, v.descripcion_de_perfil, COALESCE(ROUND(AVG(c.puntaje), 1), 0) AS promedio_calificaciones
+       FROM veterinario_o_zootecnista v
+       LEFT JOIN calificaciones c ON v.id = c.id_veterinario_o_zootecnista
+       WHERE v.id = ?
+       GROUP BY v.id, v.primer_nombre, v.segundo_nombre, v.primer_apellido, v.segundo_apellido, v.correo_electronico, v.telefono, v.foto, v.descripcion_de_perfil`,
       [id]
     );
     if (!vetRows.length) return res.status(404).json({ message: "Veterinario no encontrado" });
@@ -200,7 +203,7 @@ export const getVeterinarioDetalle = async (req, res) => {
     res.json({ vet, especializaciones, horarios, servicios });
   } catch (error) {
     console.error("Error al obtener detalle del veterinario:", error);
-    res.status(500).json({ error: "Error al obtener detalle del veterinario" });
+    res.status(500).json({ error: "Error al obtener detalle del veterinario", message: error.message });
   }
 };
 
@@ -269,7 +272,7 @@ export const updateVeterinarioProfile = async (req, res) => {
     res.status(200).json({ message: "Perfil actualizado correctamente." });
   } catch (error) {
     console.error("Error al actualizar perfil de veterinario:", error);
-    res.status(500).json({ error: "Error al actualizar perfil de veterinario" });
+    res.status(500).json({ error: "Error al actualizar perfil de veterinario", message: error.message });
   }
 };
 
@@ -291,6 +294,6 @@ export const getCitasDia = async (req, res) => {
     res.json(rows);
   } catch (error) {
     console.error('Error al obtener citas:', error);
-    res.status(500).json({ error: 'Error al obtener citas del día' });
+    res.status(500).json({ error: 'Error al obtener citas del día', message: error.message });
   }
 };

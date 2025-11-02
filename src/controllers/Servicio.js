@@ -6,9 +6,10 @@ export const getServicio = async (req, res) => {
     console.log(result);
     res.json(result);
   } catch (err) {
-    console.log(err);
+    console.error("Error al obtener servicios:", err);
     return res.status(500).json({
-      message: "Token Invalido",
+      message: "Error al obtener servicios",
+      error: err.message,
     });
   }
 };
