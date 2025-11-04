@@ -69,10 +69,10 @@ export const postUsuario = async (req, res) => {
     const hashedPassword = await bcrypt.hash(contrasena, 10);
 
     await pool.query(
-      `INSERT INTO usuario 
-      (id, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, 
-       correo_electronico, direccion, telefono, n_de_mascotas, contrasena, id_veterinario_o_zootecnista)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO usuario
+      (id, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido,
+       correo_electronico, direccion, telefono, n_de_mascotas, contrasena, foto, id_veterinario_o_zootecnista)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         primer_nombre,
@@ -84,6 +84,7 @@ export const postUsuario = async (req, res) => {
         telefono || null,
         n_de_mascotas || 0,
         hashedPassword,
+        'foto.png',
         id_veterinario_o_zootecnista || null,
       ]
     );

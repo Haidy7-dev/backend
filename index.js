@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
 import { PORT } from "./utils/config.js";
 
 // Importación de rutas
@@ -20,6 +21,7 @@ import authRoutes from "./src/routes/auth.js";
 import routercitasDueno from "./src/routes/citaDueno.js";
 import routerPerfilMascota from "./src/routes/perfilMascota.js";
 import routerCalificaciones from "./src/routes/crearCalificacion.js";
+import routerVerificarUsuario from "./src/routes/verificarUsuario.js";
 
 
 const app = express();
@@ -64,12 +66,14 @@ app.use("/api", authRoutes);
 app.use(routercitasDueno);
 app.use(routerPerfilMascota);
 app.use(routerCalificaciones);
+app.use(routerVerificarUsuario);
+app.use(routerVerificarUsuario);
 
 
 // 🧩 Archivos estáticos
 app.use(express.static("src/public"));
 app.use("/api", express.static("src/public"));
-app.use("/pethub", express.static("src/fotos"));
+app.use("/pethub", express.static(path.join(process.cwd(), "backend", "src", "fotos")));
 
 // 🧩 Ruta base
 app.get("/", (req, res) => {

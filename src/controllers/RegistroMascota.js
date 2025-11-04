@@ -41,10 +41,14 @@ export const obtenerMascotasPorUsuario = async (req, res) => {
   try {
     const { id_usuario } = req.params;
 
+    console.log("🔍 Obteniendo mascotas para id_usuario:", id_usuario);
+
     const [mascotas] = await pool.query(
       "SELECT * FROM mascota WHERE id_usuario = ?",
       [id_usuario]
     );
+
+    console.log("✅ Mascotas encontradas:", mascotas.length);
 
     res.json(mascotas);
   } catch (error) {

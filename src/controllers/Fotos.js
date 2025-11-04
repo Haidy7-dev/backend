@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import { pool } from "../../utils/db.js";
 
-const fotosDir = path.join(process.cwd(), "src", "fotos");
+const fotosDir = path.join(process.cwd(), "backend", "src", "fotos");
 
 // Crear carpeta si no existe
 if (!fs.existsSync(fotosDir)) {
