@@ -1,4 +1,3 @@
-
 import { pool } from "../../utils/db.js";
 
 function addMinutesToTime(timeStr, minutes) {
@@ -50,7 +49,7 @@ export const CreateCita = async (req, res) => {
     const [resultCita] = await connection.query(
       `INSERT INTO citas (fecha, hora_inicio, hora_finalizacion, id_usuario, id_mascota, id_veterinario_o_zootecnista, id_servicio, id_estado_cita)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [fecha, hora_inicio_corregida, hora_finalizacion, id_usuario, id_mascota || null, id_veterinario, id_servicio, 3]
+      [fecha, hora_inicio_corregida, hora_finalizacion, id_usuario, id_mascota || null, id_veterinario, id_servicio, 1]
     );
 
     const idCita = resultCita.insertId;
@@ -60,16 +59,18 @@ export const CreateCita = async (req, res) => {
     await connection.query(
       `INSERT INTO resumen_citas (id_cita, modalidad, hora_inicio, hora_finalizacion, iva, total)
        VALUES (?, ?, ?, ?, ?, ?)`,
+
       [idCita, modalidad, hora_inicio_corregida, hora_finalizacion, iva, total]
     );
 
-    await connection.commit();
-    res.status(201).json({ message: "Cita creada correctamente", id: idCita });
+        await connection.commit();
+
+        res.status(201).json({ message: "Cita creada correctamente", id: idCita });
 
   } catch (error) {
     await connection.rollback();
     console.error("❌ Error crear cita:", error);
-    res.status(500).json({ message: "Error al crear la cita" });
+    res.status(500).json({ message: "Error al crear la cita", error: error.message });
   } finally {
     connection.release();
   }

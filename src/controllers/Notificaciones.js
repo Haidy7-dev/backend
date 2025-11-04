@@ -12,12 +12,26 @@ function formatearFecha(fecha) {
 }
 
 // 🔹 Controlador principal
+import { pool } from "../../utils/db.js";
+
+
+// 🔹 Función para formatear fecha legible
+function formatearFecha(fecha) {
+  return new Date(fecha).toLocaleDateString("es-ES", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+// 🔹 Controlador principal
 export const obtenerNotificaciones = async (req, res) => {
   const { rol, id } = req.params;
   const ahora = new Date();
 
   try {
-    const [citas] = await db.query(
+    const [citas] = await pool.query(
       `SELECT fecha, hora_inicio, id_usuario, id_veterinario_o_zootecnista 
        FROM citas 
        WHERE ${rol === "veterinario" ? "id_veterinario_o_zootecnista" : "id_usuario"} = ?`,
